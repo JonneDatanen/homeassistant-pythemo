@@ -1,0 +1,14 @@
+{
+    "domain": "themo",
+    "name": "Themo Smart Thermostat integration",
+    "codeowners": [
+        "@JonneDatanen"
+    ],
+    "documentation": "https://github.com/JonneDatanen/homeassistant-pythemo",
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/JonneDatanen/homeassistant-pythemo/issues",
+    "requirements": [
+        "pythemo==0.1.0"
+    ],
+    "version": "0.1.0"
+}

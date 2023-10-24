@@ -1,0 +1,14 @@
+{
+    "services": {
+        "set_active_schedule": {
+            "name": "Set active schedule",
+            "description": "Sets currently active schedule",
+            "fields": {
+                "schedule_name": {
+                    "name": "Schedule name",
+                    "description": "Name of the schedule to set."
+                }
+            }
+        }
+    }
+}
