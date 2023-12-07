@@ -8,6 +8,7 @@ from homeassistant.components.climate.const import (
     HVAC_MODE_HEAT,
     HVAC_MODE_OFF,
     SUPPORT_TARGET_TEMPERATURE,
+    SUPPORT_PRESET_MODE,
 )
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.helpers import config_validation as cv
@@ -64,7 +65,12 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
     @property
     def supported_features(self) -> int:
         """Return supported features."""
-        return SUPPORT_TARGET_TEMPERATURE if self.hvac_mode == HVAC_MODE_HEAT else 0
+        if self.hvac_mode == HVAC_MODE_AUTO:
+            return SUPPORT_PRESET_MODE
+        elif self.hvac_mode == HVAC_MODE_HEAT:
+            return SUPPORT_TARGET_TEMPERATURE
+        else:
+            return 0
 
     @property
     def current_temperature(self) -> Optional[float]:
@@ -81,6 +87,16 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
         """Return the current HVAC mode."""
         return THEMO_TO_HA_MODES.get(self._device.mode, HVAC_MODE_OFF)
 
+    @property
+    def preset_mode(self) -> Optional[str]:
+        """Return extra state attributes."""
+        return self._device.active_schedule
+
+    @property
+    def preset_modes(self) -> Optional[list]:
+        """Return extra state attributes."""
+        return self._device.available_schedules
+
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set the target temperature."""
         temperature = kwargs.get(ATTR_TEMPERATURE)
@@ -95,15 +111,7 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
             await self._device.set_mode(themo_mode)
             self.async_write_ha_state()
 
-    async def set_active_schedule(self, schedule_name: str) -> None:
+    async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set the active schedule."""
-        await self._device.set_active_schedule(schedule_name)
+        await self._device.set_active_schedule(preset_mode)
         self.async_write_ha_state()
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return extra state attributes."""
-        return {
-            "active_schedule": self._device.active_schedule,
-            "available_schedules": self._device.available_schedules,
-        }
