@@ -7,12 +7,15 @@ from homeassistant.components.climate.const import (
     HVAC_MODE_AUTO,
     HVAC_MODE_HEAT,
     HVAC_MODE_OFF,
-    SUPPORT_TARGET_TEMPERATURE,
     SUPPORT_PRESET_MODE,
+    SUPPORT_TARGET_TEMPERATURE,
 )
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -31,16 +34,15 @@ THEMO_TO_HA_MODES = {
 HA_TO_THEMO_MODES = {v: k for k, v in THEMO_TO_HA_MODES.items()}
 
 
-async def async_setup_platform(
-    hass: Any,
-    config: dict,
-    add_entities: Any,
-    discovery_info: Optional[dict] = None,
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the Themo climate platform."""
+    """Set up the Themo climate platform from a config entry."""
     devices = hass.data[DOMAIN]["devices"]
     coordinator = hass.data[DOMAIN]["coordinator"]
-    add_entities(ThemoClimate(device, coordinator) for device in devices)
+    async_add_entities([ThemoClimate(device, coordinator) for device in devices])
 
     platform = entity_platform.current_platform.get()
     platform.async_register_entity_service(

@@ -2,6 +2,9 @@ import logging
 from typing import Any
 
 from homeassistant.components.light import LightEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -13,16 +16,15 @@ from . import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(
-    hass: Any,
-    config: dict,
-    add_entities: Any,
-    discovery_info: Any = None,
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the Themo light platform."""
+    """Set up the Themo light platform from a config entry."""
     devices = hass.data[DOMAIN]["devices"]
     coordinator = hass.data[DOMAIN]["coordinator"]
-    add_entities(ThemoLight(device, coordinator) for device in devices)
+    async_add_entities([ThemoLight(device, coordinator) for device in devices])
 
 
 class ThemoLight(CoordinatorEntity, LightEntity):

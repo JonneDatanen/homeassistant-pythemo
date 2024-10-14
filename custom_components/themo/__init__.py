@@ -2,7 +2,9 @@ import logging
 from datetime import timedelta
 from typing import Any
 
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from pythemo.client import ThemoClient
 
@@ -12,10 +14,10 @@ DOMAIN = "themo"
 SCAN_INTERVAL = timedelta(minutes=2)
 
 
-async def async_setup(hass: Any, config: dict[str, Any]) -> bool:
+async def async_setup_entry(hass: Any, config_entry: ConfigEntry) -> bool:
     """Set up the Themo component."""
-    username = config[DOMAIN][CONF_USERNAME]
-    password = config[DOMAIN][CONF_PASSWORD]
+    username = config_entry.data[CONF_USERNAME]
+    password = config_entry.data[CONF_PASSWORD]
 
     client = ThemoClient(username, password)
     await client.authenticate()
@@ -38,7 +40,17 @@ async def async_setup(hass: Any, config: dict[str, Any]) -> bool:
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
     hass.data[DOMAIN] = {"devices": devices, "coordinator": coordinator}
-    hass.helpers.discovery.load_platform("light", DOMAIN, {}, config)
-    hass.helpers.discovery.load_platform("climate", DOMAIN, {}, config)
-    hass.helpers.discovery.load_platform("sensor", DOMAIN, {}, config)
+    await hass.config_entries.async_forward_entry_setups(
+        config_entry, [Platform.LIGHT, Platform.CLIMATE, Platform.SENSOR]
+    )
     return True
+
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload a config entry."""
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        entry, [Platform.LIGHT, Platform.CLIMATE, Platform.SENSOR]
+    )
+    if unload_ok:
+        hass.data[DOMAIN] = {}
+    return unload_ok

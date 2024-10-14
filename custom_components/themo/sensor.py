@@ -9,6 +9,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import UnitOfPower
 from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -20,16 +21,15 @@ from . import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(
+async def async_setup_entry(
     hass: HomeAssistant,
-    config: dict,
-    add_entities: AddEntitiesCallback,
-    discovery_info: Any = None,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the Themo power sensor platform."""
+    """Set up the Themo power sensor platform from a config entry."""
     devices = hass.data[DOMAIN]["devices"]
     coordinator = hass.data[DOMAIN]["coordinator"]
-    add_entities(ThemoPowerSensor(device, coordinator) for device in devices)
+    async_add_entities([ThemoPowerSensor(device, coordinator) for device in devices])
 
 
 POWER_SENSOR_DESCRIPTION = SensorEntityDescription(

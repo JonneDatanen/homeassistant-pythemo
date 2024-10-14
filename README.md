@@ -13,21 +13,17 @@ To install `homeassistant-pythemo`, use HACS (Home Assistant Community Store):
 
 ## Configuration
 
-To set up the Themo integration, add the following configuration to your `configuration.yaml` file:
+To set up the Themo integration, follow these steps:
 
-```yaml
-themo:
-  username: your_email@example.com
-  password: your_password
-```
-
-Replace `your_email@example.com` and `your_password` with your Themo account credentials.
+1. Go to the Home Assistant UI.
+2. Navigate to `Configuration` > `Devices & Services`.
+3. Click on `Add Integration` and search for `Themo`.
+4. Follow the on-screen instructions to enter your Themo account credentials.
 
 ## Features
 
 1. **Climate Object**: Adjust and monitor the temperature settings of your Themo thermostat.
 2. **Light Object**: Control the light on your Themo device.
-
 3. **Sensor Object**: Measure power with the Themo device. Due to discrepancies in the data provided by the cloud, the power measurements might not always be accurate.
 
 ## Usage
