@@ -8,6 +8,13 @@ from pythemo.client import ThemoClient
 
 from . import DOMAIN
 
+DATA_SCHEMA_USER = vol.Schema(
+    {
+        vol.Required(CONF_USERNAME): cv.string,
+        vol.Required(CONF_PASSWORD): cv.string,
+    }
+)
+
 
 class ThemoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Themo integration."""
@@ -28,15 +35,8 @@ class ThemoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except Exception:
                 errors["base"] = "auth"
 
-        data_schema = vol.Schema(
-            {
-                vol.Required(CONF_USERNAME, default=""): cv.string,
-                vol.Required(CONF_PASSWORD, default=""): cv.string,
-            }
-        )
-
         return self.async_show_form(
-            step_id="user", data_schema=data_schema, errors=errors
+            step_id="user", data_schema=DATA_SCHEMA_USER, errors=errors
         )
 
     @staticmethod
@@ -53,9 +53,4 @@ class ThemoOptionsFlowHandler(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         """Manage the options."""
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema(
-                {vol.Required(CONF_USERNAME, default=""): str, vol.Required(CONF_PASSWORD, default=""): str}
-            ),
-        )
+        return self.async_show_form(step_id="init", data_schema=DATA_SCHEMA_USER)

@@ -1,0 +1,29 @@
+{
+    "title": "Themo Smart Thermostat integration",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Set up Themo",
+                "description": "Please enter your Themo account credentials.",
+                "data": {
+                    "username": "Username",
+                    "password": "Password"
+                }
+            }
+        },
+        "error": {
+            "auth": "Invalid username or password"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Adjust Themo options",
+                "data": {
+                    "username": "Username",
+                    "password": "Password"
+                }
+            }
+        }
+    }
+}
