@@ -6,6 +6,7 @@ from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+import httpx
 from pythemo.client import ThemoClient
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,7 +27,10 @@ async def async_setup_entry(hass: Any, config_entry: ConfigEntry) -> bool:
     async def async_update_data() -> list:
         """Fetch data from API endpoint."""
         for device in devices:
-            await device.update_state()
+            try:
+                await device.update_state()
+            except httpx.ConnectTimeout:
+                _LOGGER.warning("Timeout while updating device state: %s", device.name)
         return devices
 
     coordinator = DataUpdateCoordinator(
