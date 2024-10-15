@@ -18,6 +18,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .const import DOMAIN
+from .helpers import async_setup_device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,39 +45,12 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the Themo sensor platform from a config entry."""
-    devices = hass.data[DOMAIN]["devices"]
-    coordinator = hass.data[DOMAIN]["coordinator"]
-    entities = []
-
-    sensor_classes = [
-        ThemoPowerSensor,
-        ThemoFloorTemperatureSensor,
-        ThemoRoomTemperatureSensor,
-    ]
-
-    for device in devices:
-        entities.extend(create_sensors(device, coordinator, sensor_classes))
-
-    async_add_entities(entities)
-
-
-def create_sensors(
-    device: Any,
-    coordinator: DataUpdateCoordinator,
-    sensor_classes: List[Type[SensorEntity]],
-) -> List[SensorEntity]:
-    """Create sensor entities for a device."""
-    device_info = DeviceInfo(
-        identifiers={(DOMAIN, device.device_id)},
-        name=device.name,
-        manufacturer="Themo",
-        model="Smart Thermostat",
-        sw_version=device.sw_version,
+    await async_setup_device(
+        hass,
+        entry,
+        async_add_entities,
+        [ThemoPowerSensor, ThemoFloorTemperatureSensor, ThemoRoomTemperatureSensor],
     )
-    return [
-        sensor_class(device, coordinator, device_info)
-        for sensor_class in sensor_classes
-    ]
 
 
 class ThemoPowerSensor(CoordinatorEntity, SensorEntity):

@@ -18,6 +18,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .const import DOMAIN
+from .helpers import async_setup_device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,19 +36,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the Themo climate platform from a config entry."""
-    devices = hass.data[DOMAIN]["devices"]
-    coordinator = hass.data[DOMAIN]["coordinator"]
-    entities = []
-    for device in devices:
-        device_info = DeviceInfo(
-            identifiers={(DOMAIN, device.device_id)},
-            name=device.name,
-            manufacturer="Themo",
-            model="Smart Thermostat",
-            sw_version=device.sw_version,
-        )
-        entities.append(ThemoClimate(device, coordinator, device_info))
-    async_add_entities(entities)
+    await async_setup_device(hass, entry, async_add_entities, [ThemoClimate])
 
 
 class ThemoClimate(CoordinatorEntity, ClimateEntity):

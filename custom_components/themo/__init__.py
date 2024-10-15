@@ -15,9 +15,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.httpx_client import get_async_client
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import DOMAIN
-
 _LOGGER = logging.getLogger(__name__)
+DOMAIN = "themo"
 
 SCAN_INTERVAL = timedelta(minutes=2)
 
