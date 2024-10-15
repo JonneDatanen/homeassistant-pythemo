@@ -15,6 +15,7 @@ from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -22,7 +23,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 from pythemo.models import Device
 
-from . import DOMAIN
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,7 +43,16 @@ async def async_setup_entry(
     """Set up the Themo climate platform from a config entry."""
     devices = hass.data[DOMAIN]["devices"]
     coordinator = hass.data[DOMAIN]["coordinator"]
-    async_add_entities([ThemoClimate(device, coordinator) for device in devices])
+    entities = []
+    for device in devices:
+        device_info = DeviceInfo(
+            identifiers={(DOMAIN, device.device_id)},
+            name=device.name,
+            manufacturer="Themo",
+            model="Smart Thermostat",
+        )
+        entities.append(ThemoClimate(device, coordinator, device_info))
+    async_add_entities(entities)
 
     platform = entity_platform.current_platform.get()
     platform.async_register_entity_service(
@@ -55,7 +65,12 @@ async def async_setup_entry(
 class ThemoClimate(CoordinatorEntity, ClimateEntity):
     """Representation of a Themo Climate entity."""
 
-    def __init__(self, device: Device, coordinator: DataUpdateCoordinator) -> None:
+    def __init__(
+        self,
+        device: Device,
+        coordinator: DataUpdateCoordinator,
+        device_info: DeviceInfo,
+    ) -> None:
         """Initialize the climate entity."""
         super().__init__(coordinator)
         self._device = device
@@ -63,6 +78,7 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
         self._attr_unique_id = f"{device.device_id}_climate"
         self._attr_temperature_unit = UnitOfTemperature.CELSIUS
         self._attr_hvac_modes = list(THEMO_TO_HA_MODES.values())
+        self._attr_device_info = device_info
 
     @property
     def supported_features(self) -> int:

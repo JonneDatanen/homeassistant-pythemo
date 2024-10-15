@@ -2,12 +2,14 @@ import logging
 from datetime import timedelta
 from typing import Any
 
+import httpx
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-import httpx
 from pythemo.client import ThemoClient
+
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 

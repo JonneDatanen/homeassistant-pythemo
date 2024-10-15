@@ -6,7 +6,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 from pythemo.client import ThemoClient
 
-from . import DOMAIN
+from .const import DOMAIN
 
 DATA_SCHEMA_USER = vol.Schema(
     {

@@ -4,6 +4,7 @@ from typing import Any
 from homeassistant.components.light import LightEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -11,7 +12,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 from pythemo.models import Device
 
-from . import DOMAIN
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,18 +25,37 @@ async def async_setup_entry(
     """Set up the Themo light platform from a config entry."""
     devices = hass.data[DOMAIN]["devices"]
     coordinator = hass.data[DOMAIN]["coordinator"]
-    async_add_entities([ThemoLight(device, coordinator) for device in devices])
+    entities = [
+        ThemoLight(
+            device,
+            coordinator,
+            DeviceInfo(
+                identifiers={(DOMAIN, device.device_id)},
+                name=device.name,
+                manufacturer="Themo",
+                model="Smart Thermostat",
+            ),
+        )
+        for device in devices
+    ]
+    async_add_entities(entities)
 
 
 class ThemoLight(CoordinatorEntity, LightEntity):
     """Representation of a Themo Light entity."""
 
-    def __init__(self, device: Device, coordinator: DataUpdateCoordinator) -> None:
+    def __init__(
+        self,
+        device: Device,
+        coordinator: DataUpdateCoordinator,
+        device_info: DeviceInfo,
+    ) -> None:
         """Initialize the light entity."""
         super().__init__(coordinator)
         self._device = device
         self._attr_name = device.name
         self._attr_unique_id = f"{device.device_id}_light"
+        self._attr_device_info = device_info
 
     @property
     def is_on(self) -> bool:
