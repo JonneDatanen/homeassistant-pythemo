@@ -5,6 +5,7 @@ from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 from pythemo.client import ThemoClient
+from homeassistant.helpers.httpx_client import get_async_client
 
 from .const import DOMAIN
 
@@ -30,6 +31,7 @@ class ThemoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 themo_client = ThemoClient(
                     user_input[CONF_USERNAME],
                     user_input[CONF_PASSWORD],
+                    client=get_async_client(self.hass),
                 )
 
                 await themo_client.authenticate()

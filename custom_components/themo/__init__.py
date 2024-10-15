@@ -6,6 +6,7 @@ import httpx
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.httpx_client import get_async_client
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from pythemo.client import ThemoClient
 
@@ -25,6 +26,7 @@ async def async_setup_entry(hass: Any, config_entry: ConfigEntry) -> bool:
     themo_client = ThemoClient(
         username,
         password,
+        client=get_async_client(hass),
     )
     await themo_client.authenticate()
     devices = await themo_client.get_all_devices()
