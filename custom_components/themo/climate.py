@@ -48,12 +48,6 @@ async def async_setup_entry(
         entities.append(ThemoClimate(device, coordinator, device_info))
     async_add_entities(entities)
 
-    platform = entity_platform.current_platform.get()
-    platform.async_register_entity_service(
-        "set_active_schedule",
-        {vol.Required("schedule_name"): cv.string},
-        "set_active_schedule",
-    )
 
 
 class ThemoClimate(CoordinatorEntity, ClimateEntity):
