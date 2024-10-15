@@ -1,10 +1,13 @@
+"""Config flow for Themo integration."""
+
+from pythemo.client import ThemoClient
 import voluptuous as vol
+
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
-from pythemo.client import ThemoClient
 from homeassistant.helpers.httpx_client import get_async_client
 
 from .const import DOMAIN
@@ -46,13 +49,15 @@ class ThemoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
+        """Get the options flow handler for this config entry."""
         return ThemoOptionsFlowHandler(config_entry)
 
 
 class ThemoOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle Themo options."""
 
-    def __init__(self, config_entry):
+    def __init__(self, config_entry) -> None:
+        """Initialize the options flow handler."""
         self.config_entry = config_entry
 
     async def async_step_init(self, user_input=None):

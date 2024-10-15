@@ -1,24 +1,28 @@
-import logging
+"""Themo integration for Home Assistant.
+
+This module provides support for Themo devices within Home Assistant.
+"""
+
 from datetime import timedelta
-from typing import Any
+import logging
 
 import httpx
-from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from pythemo.client import ThemoClient
+
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.httpx_client import get_async_client
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from pythemo.client import ThemoClient
 
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-DOMAIN = "themo"
 SCAN_INTERVAL = timedelta(minutes=2)
 
 
-async def async_setup_entry(hass: Any, config_entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Set up the Themo component."""
     username = config_entry.data[CONF_USERNAME]
     password = config_entry.data[CONF_PASSWORD]

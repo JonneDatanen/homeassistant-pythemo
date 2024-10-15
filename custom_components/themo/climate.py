@@ -49,7 +49,6 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-
 class ThemoClimate(CoordinatorEntity, ClimateEntity):
     """Representation of a Themo Climate entity."""
 
