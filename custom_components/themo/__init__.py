@@ -22,9 +22,12 @@ async def async_setup_entry(hass: Any, config_entry: ConfigEntry) -> bool:
     username = config_entry.data[CONF_USERNAME]
     password = config_entry.data[CONF_PASSWORD]
 
-    client = ThemoClient(username, password)
-    await client.authenticate()
-    devices = await client.get_all_devices()
+    themo_client = ThemoClient(
+        username,
+        password,
+    )
+    await themo_client.authenticate()
+    devices = await themo_client.get_all_devices()
 
     async def async_update_data() -> list:
         """Fetch data from API endpoint."""

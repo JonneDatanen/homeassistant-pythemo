@@ -27,10 +27,12 @@ class ThemoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 # Attempt to authenticate with the provided credentials
-                client = ThemoClient(
-                    user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
+                themo_client = ThemoClient(
+                    user_input[CONF_USERNAME],
+                    user_input[CONF_PASSWORD],
                 )
-                await client.authenticate()
+
+                await themo_client.authenticate()
                 return self.async_create_entry(title="Themo", data=user_input)
             except Exception:
                 errors["base"] = "auth"
