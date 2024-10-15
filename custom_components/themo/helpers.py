@@ -1,13 +1,14 @@
+"""Module containing helper functions for setting up Themo devices."""
+
 import logging
-from typing import Any, List, Type
+from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import DOMAIN
+from . import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -16,7 +17,7 @@ async def async_setup_device(
     hass: HomeAssistant,
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
-    entity_classes: List[Type[Any]],
+    entity_classes: list[Any],
 ) -> None:
     """Set up Themo device and add entities."""
     devices = hass.data[DOMAIN]["devices"]

@@ -1,3 +1,5 @@
+"""Config flow for Themo integration."""
+
 import logging
 
 from pythemo.client import ThemoAuthenticationError, ThemoClient, ThemoConnectionError
@@ -10,7 +12,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.httpx_client import get_async_client
 
-from .const import DOMAIN
+from . import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -1,3 +1,5 @@
+"""Module containing the Themo light platform integration for Home Assistant."""
+
 import logging
 from typing import Any
 
@@ -13,7 +15,6 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .const import DOMAIN
 from .helpers import async_setup_device
 
 _LOGGER = logging.getLogger(__name__)

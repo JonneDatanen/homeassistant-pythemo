@@ -1,15 +1,18 @@
+"""Module containing the Themo climate platform integration for Home Assistant."""
+
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from pythemo.models import Device
-import voluptuous as vol
 
-from homeassistant.components.climate import ClimateEntity
-from homeassistant.components.climate.const import ClimateEntityFeature, HVACMode
+from homeassistant.components.climate import (
+    ClimateEntity,
+    ClimateEntityFeature,
+    HVACMode,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
@@ -17,7 +20,6 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .const import DOMAIN
 from .helpers import async_setup_device
 
 _LOGGER = logging.getLogger(__name__)
@@ -66,22 +68,22 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
                 | ClimateEntityFeature.TURN_ON
                 | ClimateEntityFeature.TURN_OFF
             )
-        elif self.hvac_mode == HVACMode.HEAT:
+        if self.hvac_mode == HVACMode.HEAT:
             return (
                 ClimateEntityFeature.TARGET_TEMPERATURE
                 | ClimateEntityFeature.TURN_ON
                 | ClimateEntityFeature.TURN_OFF
             )
-        else:
-            return 0
+
+        return 0
 
     @property
-    def current_temperature(self) -> Optional[float]:
+    def current_temperature(self) -> float | None:
         """Return the current temperature."""
         return self._device.info
 
     @property
-    def target_temperature(self) -> Optional[float]:
+    def target_temperature(self) -> float | None:
         """Return the target temperature."""
         return self._device.manual_temperature
 
@@ -91,12 +93,12 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
         return THEMO_TO_HA_MODES.get(self._device.mode, HVACMode.OFF)
 
     @property
-    def preset_mode(self) -> Optional[str]:
+    def preset_mode(self) -> str | None:
         """Return extra state attributes."""
         return self._device.active_schedule
 
     @property
-    def preset_modes(self) -> Optional[list]:
+    def preset_modes(self) -> list | None:
         """Return extra state attributes."""
         return self._device.available_schedules
 
