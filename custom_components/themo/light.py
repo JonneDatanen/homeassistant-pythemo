@@ -55,6 +55,7 @@ class ThemoLight(CoordinatorEntity, LightEntity):
         self._device = device
         self._attr_name = device.name
         self._attr_supported_color_modes = {ColorMode.ONOFF}
+        self._attr_color_mode = ColorMode.ONOFF
         self._attr_unique_id = f"{device.device_id}_light"
         self._attr_device_info = device_info
 
