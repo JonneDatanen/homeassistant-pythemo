@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from homeassistant.components.light import LightEntity
+from homeassistant.components.light import LightEntity, ColorMode
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
@@ -54,6 +54,7 @@ class ThemoLight(CoordinatorEntity, LightEntity):
         super().__init__(coordinator)
         self._device = device
         self._attr_name = device.name
+        self._attr_supported_color_modes = {ColorMode.ONOFF}
         self._attr_unique_id = f"{device.device_id}_light"
         self._attr_device_info = device_info
 

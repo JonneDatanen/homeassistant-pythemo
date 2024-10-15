@@ -3,13 +3,7 @@ from typing import Any, Optional
 
 import voluptuous as vol
 from homeassistant.components.climate import ClimateEntity
-from homeassistant.components.climate.const import (
-    HVAC_MODE_AUTO,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_OFF,
-    SUPPORT_PRESET_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
-)
+from homeassistant.components.climate.const import ClimateEntityFeature, HVACMode
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
@@ -28,9 +22,9 @@ from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 THEMO_TO_HA_MODES = {
-    "Off": HVAC_MODE_OFF,
-    "Manual": HVAC_MODE_HEAT,
-    "SLS": HVAC_MODE_AUTO,
+    "Off": HVACMode.OFF,
+    "Manual": HVACMode.HEAT,
+    "SLS": HVACMode.AUTO,
 }
 HA_TO_THEMO_MODES = {v: k for k, v in THEMO_TO_HA_MODES.items()}
 
@@ -83,10 +77,18 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
     @property
     def supported_features(self) -> int:
         """Return supported features."""
-        if self.hvac_mode == HVAC_MODE_AUTO:
-            return SUPPORT_PRESET_MODE
-        elif self.hvac_mode == HVAC_MODE_HEAT:
-            return SUPPORT_TARGET_TEMPERATURE
+        if self.hvac_mode == HVACMode.AUTO:
+            return (
+                ClimateEntityFeature.PRESET_MODE
+                | ClimateEntityFeature.TURN_ON
+                | ClimateEntityFeature.TURN_OFF
+            )
+        elif self.hvac_mode == HVACMode.HEAT:
+            return (
+                ClimateEntityFeature.TARGET_TEMPERATURE
+                | ClimateEntityFeature.TURN_ON
+                | ClimateEntityFeature.TURN_OFF
+            )
         else:
             return 0
 
@@ -103,7 +105,7 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
     @property
     def hvac_mode(self) -> str:
         """Return the current HVAC mode."""
-        return THEMO_TO_HA_MODES.get(self._device.mode, HVAC_MODE_OFF)
+        return THEMO_TO_HA_MODES.get(self._device.mode, HVACMode.OFF)
 
     @property
     def preset_mode(self) -> Optional[str]:
@@ -118,7 +120,7 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set the target temperature."""
         temperature = kwargs.get(ATTR_TEMPERATURE)
-        if temperature and self.hvac_mode == HVAC_MODE_HEAT:
+        if temperature and self.hvac_mode == HVACMode.HEAT:
             await self._device.set_manual_temperature(temperature)
             self.async_write_ha_state()
 
