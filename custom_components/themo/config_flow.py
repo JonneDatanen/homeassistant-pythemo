@@ -1,6 +1,6 @@
-"""Config flow for Themo integration."""
+import logging
 
-from pythemo.client import ThemoClient
+from pythemo.client import ThemoAuthenticationError, ThemoClient, ThemoConnectionError
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -11,6 +11,8 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.httpx_client import get_async_client
 
 from .const import DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
 
 DATA_SCHEMA_USER = vol.Schema(
     {
@@ -39,8 +41,16 @@ class ThemoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
                 await themo_client.authenticate()
                 return self.async_create_entry(title="Themo", data=user_input)
-            except Exception:
-                errors["base"] = "auth"
+
+            except ThemoAuthenticationError as e:
+                _LOGGER.error("Failed to authenticate with Themo: %s", e)
+                errors = {"base": "invalid_auth"}
+            except ThemoConnectionError as e:
+                _LOGGER.error("Failed to connect to Themo: %s", e)
+                errors = {"base": "cannot_connect"}
+            except Exception as e:  # noqa: BLE001
+                _LOGGER.error("An unknown error occurred: %s", e)
+                errors = {"base": "unknown"}
 
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA_USER, errors=errors

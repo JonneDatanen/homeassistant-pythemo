@@ -12,7 +12,9 @@
             }
         },
         "error": {
-            "auth": "Invalid username or password"
+            "cannot_connect": "Cannot connect to Themo API",
+            "invalid_auth": "Invalid username or password",
+            "unknown": "Unknown error"
         }
     },
     "options": {
