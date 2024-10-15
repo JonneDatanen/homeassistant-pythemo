@@ -1,7 +1,9 @@
 import logging
 from typing import Any
 
-from homeassistant.components.light import LightEntity, ColorMode
+from pythemo.models import Device
+
+from homeassistant.components.light import ColorMode, LightEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
@@ -10,7 +12,6 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
-from pythemo.models import Device
 
 from .const import DOMAIN
 
@@ -34,6 +35,7 @@ async def async_setup_entry(
                 name=device.name,
                 manufacturer="Themo",
                 model="Smart Thermostat",
+                sw_version=device.sw_version,
             ),
         )
         for device in devices

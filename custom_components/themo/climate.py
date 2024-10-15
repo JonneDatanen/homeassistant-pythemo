@@ -1,21 +1,21 @@
 import logging
 from typing import Any, Optional
 
+from pythemo.models import Device
 import voluptuous as vol
+
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import ClimateEntityFeature, HVACMode
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers import entity_platform
+from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
-from pythemo.models import Device
 
 from .const import DOMAIN
 
@@ -44,6 +44,7 @@ async def async_setup_entry(
             name=device.name,
             manufacturer="Themo",
             model="Smart Thermostat",
+            sw_version=device.sw_version,
         )
         entities.append(ThemoClimate(device, coordinator, device_info))
     async_add_entities(entities)

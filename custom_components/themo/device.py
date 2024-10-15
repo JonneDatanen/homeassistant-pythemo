@@ -4,7 +4,11 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .climate import ThemoClimate
 from .const import DOMAIN
 from .light import ThemoLight
-from .sensor import ThemoPowerSensor
+from .sensor import (
+    ThemoFloorTemperatureSensor,
+    ThemoPowerSensor,
+    ThemoRoomTemperatureSensor,
+)
 
 
 class ThemoDevice:
@@ -19,7 +23,14 @@ class ThemoDevice:
             name=device.name,
             manufacturer="Themo",
             model="Smart Thermostat",
+            sw_version=device.sw_version,
         )
         self.climate = ThemoClimate(device, coordinator, self.device_info)
         self.light = ThemoLight(device, coordinator, self.device_info)
         self.power_sensor = ThemoPowerSensor(device, coordinator, self.device_info)
+        self.room_temperature = ThemoRoomTemperatureSensor(
+            device, coordinator, self.device_info
+        )
+        self.floor_tempeature = ThemoFloorTemperatureSensor(
+            device, coordinator, self.device_info
+        )
