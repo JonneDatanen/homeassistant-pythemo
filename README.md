@@ -38,7 +38,7 @@ To set up the Themo integration, follow these steps:
 
 ## Contributions
 
-For issues, contributions, or feature requests related to this integration, please refer to the GitHub repository. For cloud connection implementation details, check out the [pythemo](https://github.com/JonneDatanen/pythemo) package or [Themo API Documentation](https://documenter.getpostman.com/view/3050060/S1TZzbtx).
+For issues, contributions, or feature requests related to this integration, please refer to the GitHub repository. For cloud connection implementation details, check out the [pythemo](https://github.com/JonneDatanen/pythemo) package or [Themo API Documentation](https://connect.themo.io/swagger/index.html).
 
 ## License
 
@@ -46,5 +46,5 @@ This project is licensed under the MIT License. See the `LICENSE` file in the Gi
 
 ## Additional Resources
 
-- [Themo API Documentation](https://documenter.getpostman.com/view/3050060/S1TZzbtx)
+- [Themo API Documentation](https://connect.themo.io/swagger/index.html)
 - [pythemo](https://github.com/JonneDatanen/pythemo)
