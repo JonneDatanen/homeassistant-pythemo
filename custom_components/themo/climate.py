@@ -60,7 +60,7 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
         self._attr_device_info = device_info
 
     @property
-    def supported_features(self) -> int:
+    def supported_features(self) -> ClimateEntityFeature:
         """Return supported features."""
         if self.hvac_mode == HVACMode.AUTO:
             return (
@@ -75,7 +75,7 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
                 | ClimateEntityFeature.TURN_OFF
             )
 
-        return 0
+        return ClimateEntityFeature.TURN_ON | ClimateEntityFeature.TURN_OFF
 
     @property
     def current_temperature(self) -> float | None:
