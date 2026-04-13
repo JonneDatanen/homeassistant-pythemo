@@ -20,8 +20,9 @@ async def async_setup_device(
     entity_classes: list[Any],
 ) -> None:
     """Set up Themo device and add entities."""
-    devices = hass.data[DOMAIN]["devices"]
-    coordinator = hass.data[DOMAIN]["coordinator"]
+    entry_data = hass.data[DOMAIN][entry.entry_id]
+    devices = entry_data["devices"]
+    coordinator = entry_data["coordinator"]
     entities = [
         entity_class(
             device,

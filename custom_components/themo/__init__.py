@@ -7,11 +7,16 @@ from datetime import timedelta
 import logging
 
 import httpx
-from pythemo.client import ThemoClient
+from pythemo.client import (
+    ThemoAuthenticationError,
+    ThemoClient,
+    ThemoConnectionError,
+)
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers.httpx_client import get_async_client
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
@@ -31,15 +36,23 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         password,
         client=get_async_client(hass),
     )
-    await themo_client.authenticate()
-    devices = await themo_client.get_all_devices()
+
+    try:
+        await themo_client.authenticate()
+        devices = await themo_client.get_all_devices()
+    except ThemoAuthenticationError as err:
+        raise ConfigEntryAuthFailed(
+            "Themo authentication failed, please reconfigure credentials"
+        ) from err
+    except (ThemoConnectionError, httpx.TimeoutException) as err:
+        raise ConfigEntryNotReady("Unable to reach Themo API") from err
 
     async def async_update_data() -> list:
         """Fetch data from API endpoint."""
         for device in devices:
             try:
                 await device.update_state()
-            except httpx.ConnectTimeout:
+            except (ThemoConnectionError, httpx.TimeoutException):
                 _LOGGER.warning("Timeout while updating device state: %s", device.name)
         return devices
 
@@ -53,7 +66,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
-    hass.data[DOMAIN] = {"devices": devices, "coordinator": coordinator}
+    hass.data.setdefault(DOMAIN, {})[config_entry.entry_id] = {
+        "devices": devices,
+        "coordinator": coordinator,
+    }
     await hass.config_entries.async_forward_entry_setups(
         config_entry, [Platform.LIGHT, Platform.CLIMATE, Platform.SENSOR]
     )
@@ -66,5 +82,5 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry, [Platform.LIGHT, Platform.CLIMATE, Platform.SENSOR]
     )
     if unload_ok:
-        hass.data[DOMAIN] = {}
+        hass.data[DOMAIN].pop(entry.entry_id, None)
     return unload_ok
