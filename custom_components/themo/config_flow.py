@@ -68,6 +68,10 @@ class ThemoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class ThemoOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle Themo options."""
 
+    def __init__(self, config_entry) -> None:
+        """Initialize options flow."""
+        self._config_entry = config_entry
+
     async def async_step_init(self, user_input=None):
         """Manage the options."""
         if user_input is not None:
@@ -79,11 +83,11 @@ class ThemoOptionsFlowHandler(config_entries.OptionsFlow):
                 {
                     vol.Required(
                         CONF_USERNAME,
-                        default=self.config_entry.data.get(CONF_USERNAME, ""),
+                        default=self._config_entry.data.get(CONF_USERNAME, ""),
                     ): cv.string,
                     vol.Required(
                         CONF_PASSWORD,
-                        default=self.config_entry.data.get(CONF_PASSWORD, ""),
+                        default=self._config_entry.data.get(CONF_PASSWORD, ""),
                     ): cv.string,
                 }
             ),
