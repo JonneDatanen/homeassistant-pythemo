@@ -9,23 +9,24 @@
                     "username": "Username",
                     "password": "Password"
                 }
+            },
+            "reauth_confirm": {
+                "title": "Re-authenticate Themo",
+                "description": "Your Themo credentials are no longer valid. Please enter your credentials again.",
+                "data": {
+                    "username": "Username",
+                    "password": "Password"
+                }
             }
         },
         "error": {
             "cannot_connect": "Cannot connect to Themo API",
             "invalid_auth": "Invalid username or password",
             "unknown": "Unknown error"
-        }
-    },
-    "options": {
-        "step": {
-            "init": {
-                "title": "Adjust Themo options",
-                "data": {
-                    "username": "Username",
-                    "password": "Password"
-                }
-            }
+        },
+        "abort": {
+            "reauth_successful": "Re-authentication was successful",
+            "entry_not_found": "The integration entry could not be found"
         }
     }
 }

@@ -19,7 +19,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from . import DOMAIN
+from . import DOMAIN  # noqa: F401  imported for re-export; used by helpers
 from .helpers import async_setup_device
 
 _LOGGER = logging.getLogger(__name__)
@@ -71,8 +71,10 @@ class ThemoPowerSensor(CoordinatorEntity, SensorEntity):
         self._attr_device_info = device_info
 
     @property
-    def state(self) -> float:
+    def native_value(self) -> float | None:
         """Return the state of the sensor."""
+        if self._device.power is None or self._device.max_power is None:
+            return None
         return self._device.power * self._device.max_power * 1e3
 
 
@@ -94,7 +96,7 @@ class ThemoFloorTemperatureSensor(CoordinatorEntity, SensorEntity):
         self._attr_device_info = device_info
 
     @property
-    def state(self) -> float:
+    def native_value(self) -> float | None:
         """Return the state of the sensor."""
         return self._device.floor_temperature
 
@@ -117,6 +119,6 @@ class ThemoRoomTemperatureSensor(CoordinatorEntity, SensorEntity):
         self._attr_device_info = device_info
 
     @property
-    def state(self) -> float:
+    def native_value(self) -> float | None:
         """Return the state of the sensor."""
         return self._device.room_temperature

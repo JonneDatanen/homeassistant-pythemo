@@ -54,12 +54,12 @@ class ThemoLight(CoordinatorEntity, LightEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the light on."""
-        _LOGGER.info("Turning light on for device: %s", self._device)
+        _LOGGER.debug("Turning light on for device: %s", self._device)
         await self._device.set_lights(True)
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the light off."""
-        _LOGGER.info("Turning light off for device: %s", self._device)
+        _LOGGER.debug("Turning light off for device: %s", self._device)
         await self._device.set_lights(False)
         self.async_write_ha_state()

@@ -80,7 +80,7 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
     @property
     def current_temperature(self) -> float | None:
         """Return the current temperature."""
-        return self._device.info
+        return self._device.room_temperature
 
     @property
     def target_temperature(self) -> float | None:
@@ -105,7 +105,7 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set the target temperature."""
         temperature = kwargs.get(ATTR_TEMPERATURE)
-        if temperature and self.hvac_mode == HVACMode.HEAT:
+        if temperature is not None and self.hvac_mode == HVACMode.HEAT:
             await self._device.set_manual_temperature(temperature)
             self.async_write_ha_state()
 

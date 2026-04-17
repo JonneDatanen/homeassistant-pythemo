@@ -54,6 +54,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
                 await device.update_state()
             except (ThemoConnectionError, httpx.TimeoutException):
                 _LOGGER.warning("Timeout while updating device state: %s", device.name)
+            except Exception:  # noqa: BLE001
+                _LOGGER.exception("Unexpected error updating device state: %s", device.name)
         return devices
 
     coordinator = DataUpdateCoordinator(
@@ -82,5 +84,5 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry, [Platform.LIGHT, Platform.CLIMATE, Platform.SENSOR]
     )
     if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id, None)
+        hass.data.get(DOMAIN, {}).pop(entry.entry_id, None)
     return unload_ok

@@ -7,7 +7,6 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.httpx_client import get_async_client
@@ -58,37 +57,50 @@ class ThemoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=DATA_SCHEMA_USER, errors=errors
         )
 
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry):
-        """Get the options flow handler for this config entry."""
-        return ThemoOptionsFlowHandler(config_entry)
+    async def async_step_reauth(self, entry_data) -> FlowResult:
+        """Handle re-authentication when credentials are rejected."""
+        return await self.async_step_reauth_confirm()
 
+    async def async_step_reauth_confirm(self, user_input=None) -> FlowResult:
+        """Show re-authentication form and validate new credentials."""
+        errors = {}
+        entry = self.hass.config_entries.async_get_entry(self.context["entry_id"])
 
-class ThemoOptionsFlowHandler(config_entries.OptionsFlow):
-    """Handle Themo options."""
+        if entry is None:
+            return self.async_abort(reason="entry_not_found")
 
-    def __init__(self, config_entry) -> None:
-        """Initialize options flow."""
-        self._config_entry = config_entry
-
-    async def async_step_init(self, user_input=None):
-        """Manage the options."""
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            try:
+                themo_client = ThemoClient(
+                    user_input[CONF_USERNAME],
+                    user_input[CONF_PASSWORD],
+                    client=get_async_client(self.hass),
+                )
+                await themo_client.authenticate()
+            except ThemoAuthenticationError as e:
+                _LOGGER.error("Failed to re-authenticate with Themo: %s", e)
+                errors = {"base": "invalid_auth"}
+            except ThemoConnectionError as e:
+                _LOGGER.error("Failed to connect to Themo during reauth: %s", e)
+                errors = {"base": "cannot_connect"}
+            except Exception as e:  # noqa: BLE001
+                _LOGGER.error("Unknown error during Themo reauth: %s", e)
+                errors = {"base": "unknown"}
+            else:
+                self.hass.config_entries.async_update_entry(entry, data=user_input)
+                await self.hass.config_entries.async_reload(entry.entry_id)
+                return self.async_abort(reason="reauth_successful")
 
         return self.async_show_form(
-            step_id="init",
+            step_id="reauth_confirm",
             data_schema=vol.Schema(
                 {
                     vol.Required(
                         CONF_USERNAME,
-                        default=self._config_entry.data.get(CONF_USERNAME, ""),
+                        default=entry.data.get(CONF_USERNAME, "") if entry else "",
                     ): cv.string,
-                    vol.Required(
-                        CONF_PASSWORD,
-                        default=self._config_entry.data.get(CONF_PASSWORD, ""),
-                    ): cv.string,
+                    vol.Required(CONF_PASSWORD): cv.string,
                 }
             ),
+            errors=errors,
         )
