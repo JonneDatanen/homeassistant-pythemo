@@ -1,5 +1,6 @@
 """Module containing helper functions for setting up Themo devices."""
 
+import logging
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
