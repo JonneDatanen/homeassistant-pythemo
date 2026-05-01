@@ -9,7 +9,7 @@
     "iot_class": "cloud_polling",
     "issue_tracker": "https://github.com/JonneDatanen/homeassistant-pythemo/issues",
     "requirements": [
-        "pythemo==0.3.0"
+        "pythemo==0.3.1"
     ],
-    "version": "0.4.0"
+    "version": "0.4.1-beta.1"
 }
