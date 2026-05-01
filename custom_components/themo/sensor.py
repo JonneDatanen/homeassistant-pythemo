@@ -73,7 +73,7 @@ class ThemoPowerSensor(CoordinatorEntity, SensorEntity):
     @property
     def state(self) -> float:
         """Return the state of the sensor."""
-        return self._device.power * self._device.max_power * 1e3
+        return self._device.load_state * self._device.max_power * 1e3
 
 
 class ThemoFloorTemperatureSensor(CoordinatorEntity, SensorEntity):
