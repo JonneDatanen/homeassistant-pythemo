@@ -1,6 +1,5 @@
 """Module containing helper functions for setting up Themo devices."""
 
-import logging
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -9,8 +8,6 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DOMAIN
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_device(

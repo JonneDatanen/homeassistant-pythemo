@@ -73,9 +73,9 @@ class ThemoPowerSensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self) -> float | None:
         """Return the state of the sensor."""
-        if self._device.power is None or self._device.max_power is None:
+        if self._device.load_state is None or self._device.max_power is None:
             return None
-        return self._device.power * self._device.max_power * 1e3
+        return self._device.load_state * self._device.max_power * 1e3
 
 
 class ThemoFloorTemperatureSensor(CoordinatorEntity, SensorEntity):
