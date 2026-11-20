@@ -51,6 +51,10 @@ async def async_setup_entry(
 class ThemoClimate(CoordinatorEntity, ClimateEntity):
     """Representation of a Themo Climate entity."""
 
+    # The climate entity is the main feature of the device, so it carries the
+    # device name itself; the other entities get a suffix.
+    _attr_has_entity_name = True
+    _attr_name = None
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_min_temp = MIN_TEMPERATURE
     _attr_max_temp = MAX_TEMPERATURE
@@ -74,7 +78,6 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
         """Initialize the climate entity."""
         super().__init__(coordinator)
         self._device = device
-        self._attr_name = device.name
         self._attr_unique_id = f"{device.device_id}_climate"
         self._attr_hvac_modes = list(THEMO_TO_HA_MODES.values())
         self._attr_device_info = device_info

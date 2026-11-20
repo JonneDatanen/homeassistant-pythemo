@@ -31,6 +31,10 @@ To set up the Themo integration, follow these steps:
 4. **Floor Temperature Entity**: Monitor the floor temperature with the Themo device.
 5. **Air Temperature Entity**: Monitor the air temperature with the Themo device.
 
+## Naming
+
+Each thermostat is added as a device named `Themo <name>`, where `<name>` is the name you gave it in the Themo app (for example `Themo Bathroom`). The climate entity carries the device name, and the other entities are named `Themo <name> Light`, `Themo <name> Floor temperature`, `Themo <name> Room temperature` and `Themo <name> Power`. Searching for "Themo" in the *Add to dashboard* dialog or any entity picker therefore lists the thermostat, and Home Assistant suggests the Thermostat card for it. You can rename the device or any entity in Home Assistant as usual.
+
 ## Known Issues
 
 - **Note: This integration is currently tested on only one device, and there is no guarantee that it will work properly on other devices.**

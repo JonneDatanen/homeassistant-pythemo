@@ -19,7 +19,6 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from . import DOMAIN
 from .helpers import async_setup_device
 
 _LOGGER = logging.getLogger(__name__)
@@ -58,6 +57,7 @@ async def async_setup_entry(
 class ThemoPowerSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Themo Power Sensor."""
 
+    _attr_has_entity_name = True
     entity_description: SensorEntityDescription = POWER_SENSOR_DESCRIPTION
 
     def __init__(
@@ -66,7 +66,7 @@ class ThemoPowerSensor(CoordinatorEntity, SensorEntity):
         """Initialize the power sensor."""
         super().__init__(coordinator)
         self._device = device
-        self._attr_name = f"{device.name} {POWER_SENSOR_DESCRIPTION.name}"
+        self._attr_name = POWER_SENSOR_DESCRIPTION.name
         self._attr_unique_id = f"{device.device_id}_{POWER_SENSOR_DESCRIPTION.key}"
         self._attr_device_info = device_info
 
@@ -79,6 +79,7 @@ class ThemoPowerSensor(CoordinatorEntity, SensorEntity):
 class ThemoFloorTemperatureSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Themo Floor Temperature Sensor."""
 
+    _attr_has_entity_name = True
     entity_description: SensorEntityDescription = TEMPERATURE_SENSOR_DESCRIPTION
 
     def __init__(
@@ -87,7 +88,7 @@ class ThemoFloorTemperatureSensor(CoordinatorEntity, SensorEntity):
         """Initialize the floor temperature sensor."""
         super().__init__(coordinator)
         self._device = device
-        self._attr_name = f"{device.name} floor temperature"
+        self._attr_name = "Floor temperature"
         self._attr_unique_id = (
             f"{device.device_id}_floor_{TEMPERATURE_SENSOR_DESCRIPTION.key}"
         )
@@ -102,6 +103,7 @@ class ThemoFloorTemperatureSensor(CoordinatorEntity, SensorEntity):
 class ThemoRoomTemperatureSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Themo Room Temperature Sensor."""
 
+    _attr_has_entity_name = True
     entity_description: SensorEntityDescription = TEMPERATURE_SENSOR_DESCRIPTION
 
     def __init__(
@@ -110,7 +112,7 @@ class ThemoRoomTemperatureSensor(CoordinatorEntity, SensorEntity):
         """Initialize the room temperature sensor."""
         super().__init__(coordinator)
         self._device = device
-        self._attr_name = f"{device.name} room temperature"
+        self._attr_name = "Room temperature"
         self._attr_unique_id = (
             f"{device.device_id}_room_{TEMPERATURE_SENSOR_DESCRIPTION.key}"
         )
