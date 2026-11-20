@@ -12,6 +12,23 @@ from . import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+MANUFACTURER = "Themo"
+
+
+def device_name(name: str | None) -> str:
+    """Return the Home Assistant device name for a Themo device.
+
+    The brand is prefixed to the name given in the Themo app so the device and
+    its entities can be found by searching for "Themo" in dashboards and
+    entity pickers. Names that already mention Themo are left as they are.
+    """
+    name = (name or "").strip()
+    if not name:
+        return MANUFACTURER
+    if MANUFACTURER.lower() in name.lower():
+        return name
+    return f"{MANUFACTURER} {name}"
+
 
 async def async_setup_device(
     hass: HomeAssistant,
@@ -28,8 +45,8 @@ async def async_setup_device(
             coordinator,
             DeviceInfo(
                 identifiers={(DOMAIN, device.device_id)},
-                name=device.name,
-                manufacturer="Themo",
+                name=device_name(device.name),
+                manufacturer=MANUFACTURER,
                 model="Smart Thermostat",
                 sw_version=device.sw_version,
             ),

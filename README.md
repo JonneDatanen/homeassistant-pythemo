@@ -25,11 +25,15 @@ To set up the Themo integration, follow these steps:
 
 ## Features
 
-1. **Climate Entity**: Adjust and monitor the temperature settings of your Themo thermostat.
+1. **Climate Entity**: Adjust and monitor the temperature settings of your Themo thermostat. Works with the standard Home Assistant thermostat card: it shows the current temperature, the target temperature, whether the device is heating or idle, and lets you switch between Off, Heat (Themo "Manual") and Auto (Themo "SLS" schedule) modes. Schedules are exposed as presets. Setting a target temperature while in Off or Auto mode switches the device to Manual mode, because Themo only follows the manual setpoint in that mode.
 2. **Light Entity**: Control the light on your Themo device.
 3. **Power Entity**: Estimated power of the Themo device. The power is calculated as the device power status (1/0) multiplied by the configure maximum power of the device. Note that the power measurements can be very inaccurate due to really inaccurate power status.
 4. **Floor Temperature Entity**: Monitor the floor temperature with the Themo device.
 5. **Air Temperature Entity**: Monitor the air temperature with the Themo device.
+
+## Naming
+
+Each thermostat is added as a device named `Themo <name>`, where `<name>` is the name you gave it in the Themo app (for example `Themo Bathroom`). The climate entity carries the device name, and the other entities are named `Themo <name> Light`, `Themo <name> Floor temperature`, `Themo <name> Room temperature` and `Themo <name> Power`. Searching for "Themo" in the *Add to dashboard* dialog or any entity picker therefore lists the thermostat, and Home Assistant suggests the Thermostat card for it. You can rename the device or any entity in Home Assistant as usual.
 
 ## Known Issues
 

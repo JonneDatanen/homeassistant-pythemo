@@ -32,6 +32,9 @@ async def async_setup_entry(
 class ThemoLight(CoordinatorEntity, LightEntity):
     """Representation of a Themo Light entity."""
 
+    _attr_has_entity_name = True
+    _attr_name = "Light"
+
     def __init__(
         self,
         device: Device,
@@ -41,7 +44,6 @@ class ThemoLight(CoordinatorEntity, LightEntity):
         """Initialize the light entity."""
         super().__init__(coordinator)
         self._device = device
-        self._attr_name = device.name
         self._attr_supported_color_modes = {ColorMode.ONOFF}
         self._attr_color_mode = ColorMode.ONOFF
         self._attr_unique_id = f"{device.device_id}_light"
