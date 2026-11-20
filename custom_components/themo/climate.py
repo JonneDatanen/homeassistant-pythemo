@@ -6,8 +6,10 @@ from typing import Any
 from pythemo.models import Device
 
 from homeassistant.components.climate import (
+    ATTR_HVAC_MODE,
     ClimateEntity,
     ClimateEntityFeature,
+    HVACAction,
     HVACMode,
 )
 from homeassistant.config_entries import ConfigEntry
@@ -31,6 +33,11 @@ THEMO_TO_HA_MODES = {
 }
 HA_TO_THEMO_MODES = {v: k for k, v in THEMO_TO_HA_MODES.items()}
 
+# Manual temperature range accepted by the Themo API (CMT command).
+MIN_TEMPERATURE = 13.0
+MAX_TEMPERATURE = 41.0
+TEMPERATURE_STEP = 0.5
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -44,6 +51,20 @@ async def async_setup_entry(
 class ThemoClimate(CoordinatorEntity, ClimateEntity):
     """Representation of a Themo Climate entity."""
 
+    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_min_temp = MIN_TEMPERATURE
+    _attr_max_temp = MAX_TEMPERATURE
+    _attr_target_temperature_step = TEMPERATURE_STEP
+    # Advertise a fixed feature set so the thermostat card always renders the
+    # setpoint control. Changing the setpoint while in Off/Auto switches the
+    # device to Manual mode, see async_set_temperature.
+    _attr_supported_features = (
+        ClimateEntityFeature.TARGET_TEMPERATURE
+        | ClimateEntityFeature.PRESET_MODE
+        | ClimateEntityFeature.TURN_ON
+        | ClimateEntityFeature.TURN_OFF
+    )
+
     def __init__(
         self,
         device: Device,
@@ -55,61 +76,64 @@ class ThemoClimate(CoordinatorEntity, ClimateEntity):
         self._device = device
         self._attr_name = device.name
         self._attr_unique_id = f"{device.device_id}_climate"
-        self._attr_temperature_unit = UnitOfTemperature.CELSIUS
         self._attr_hvac_modes = list(THEMO_TO_HA_MODES.values())
         self._attr_device_info = device_info
 
     @property
-    def supported_features(self) -> ClimateEntityFeature:
-        """Return supported features."""
-        if self.hvac_mode == HVACMode.AUTO:
-            return (
-                ClimateEntityFeature.PRESET_MODE
-                | ClimateEntityFeature.TURN_ON
-                | ClimateEntityFeature.TURN_OFF
-            )
-        if self.hvac_mode == HVACMode.HEAT:
-            return (
-                ClimateEntityFeature.TARGET_TEMPERATURE
-                | ClimateEntityFeature.TURN_ON
-                | ClimateEntityFeature.TURN_OFF
-            )
-
-        return ClimateEntityFeature.TURN_ON | ClimateEntityFeature.TURN_OFF
-
-    @property
     def current_temperature(self) -> float | None:
-        """Return the current temperature."""
+        """Return the temperature of the sensor the device is controlling on."""
         return self._device.info
 
     @property
     def target_temperature(self) -> float | None:
-        """Return the target temperature."""
+        """Return the manual target temperature."""
         return self._device.manual_temperature
 
     @property
-    def hvac_mode(self) -> str:
+    def hvac_mode(self) -> HVACMode:
         """Return the current HVAC mode."""
         return THEMO_TO_HA_MODES.get(self._device.mode, HVACMode.OFF)
 
     @property
+    def hvac_action(self) -> HVACAction:
+        """Return whether the device is currently heating."""
+        if self.hvac_mode == HVACMode.OFF:
+            return HVACAction.OFF
+        heating = self._device.load_state
+        if heating is None:
+            heating = self._device.power
+        return HVACAction.HEATING if heating else HVACAction.IDLE
+
+    @property
     def preset_mode(self) -> str | None:
-        """Return extra state attributes."""
+        """Return the active schedule."""
         return self._device.active_schedule
 
     @property
     def preset_modes(self) -> list | None:
-        """Return extra state attributes."""
+        """Return the available schedules."""
         return self._device.available_schedules
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
-        """Set the target temperature."""
-        temperature = kwargs.get(ATTR_TEMPERATURE)
-        if temperature and self.hvac_mode == HVACMode.HEAT:
-            await self._device.set_manual_temperature(temperature)
-            self.async_write_ha_state()
+        """Set the target temperature.
 
-    async def async_set_hvac_mode(self, hvac_mode: str) -> None:
+        The Themo device only follows the manual setpoint in Manual mode, so the
+        device is switched to Manual first when it is in Off or Auto (SLS) mode.
+        """
+        temperature = kwargs.get(ATTR_TEMPERATURE)
+        if temperature is None:
+            return
+
+        hvac_mode = kwargs.get(ATTR_HVAC_MODE)
+        if hvac_mode is not None and hvac_mode != self.hvac_mode:
+            await self.async_set_hvac_mode(hvac_mode)
+        elif self.hvac_mode != HVACMode.HEAT:
+            await self._device.set_mode(HA_TO_THEMO_MODES[HVACMode.HEAT])
+
+        await self._device.set_manual_temperature(temperature)
+        self.async_write_ha_state()
+
+    async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set the HVAC mode."""
         themo_mode = HA_TO_THEMO_MODES.get(hvac_mode)
         if themo_mode:

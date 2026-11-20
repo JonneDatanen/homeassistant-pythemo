@@ -25,7 +25,7 @@ To set up the Themo integration, follow these steps:
 
 ## Features
 
-1. **Climate Entity**: Adjust and monitor the temperature settings of your Themo thermostat.
+1. **Climate Entity**: Adjust and monitor the temperature settings of your Themo thermostat. Works with the standard Home Assistant thermostat card: it shows the current temperature, the target temperature, whether the device is heating or idle, and lets you switch between Off, Heat (Themo "Manual") and Auto (Themo "SLS" schedule) modes. Schedules are exposed as presets. Setting a target temperature while in Off or Auto mode switches the device to Manual mode, because Themo only follows the manual setpoint in that mode.
 2. **Light Entity**: Control the light on your Themo device.
 3. **Power Entity**: Estimated power of the Themo device. The power is calculated as the device power status (1/0) multiplied by the configure maximum power of the device. Note that the power measurements can be very inaccurate due to really inaccurate power status.
 4. **Floor Temperature Entity**: Monitor the floor temperature with the Themo device.
